@@ -47,10 +47,7 @@ struct ContentView: View {
                         Button {
                             flagTapped(number)
                         } label: {
-                            Image(countries[number])
-                                .renderingMode(.original)
-                                .clipShape(Capsule())
-                                .shadow(radius: 5)
+                            FlagImage(countries[number])
                         }
                     }
                 }
@@ -88,6 +85,14 @@ struct ContentView: View {
         } message: {
             Text("Your score is \(score) !")
         }
+    }
+    
+    @ViewBuilder
+    private func FlagImage(_ name: String) -> some View {
+        Image(name)
+            .renderingMode(.original)
+            .clipShape(Capsule())
+            .shadow(radius: 5)
     }
     
     func flagTapped(_ number: Int) {
