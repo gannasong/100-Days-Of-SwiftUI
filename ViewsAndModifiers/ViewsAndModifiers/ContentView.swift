@@ -10,20 +10,7 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         Text("Hello, world")
-            .padding()
-//            .background(.green)
-//            .padding()
-//            .background(.red)
-//            .padding()
-//            .background(.yellow)
-//            .padding()
-//            .background(.indigo)
-//            .padding()
-//            .background(.gray)
-            .onTapGesture {
-                print(type(of: self.body))
-            }
-            
+            .makeLargeBlueTitle(with: "Today is Day24")
     }
 }
 
