@@ -13,8 +13,8 @@ struct ContentView: View {
     @State private var sleepAmount = 8.0
     @State private var coffeeAmount = 1
     
-    @State private var alertTitle = ""
-    @State private var alertMessage = ""
+    @State private var alertTitle = "Please input value..."
+    @State private var alertMessage = "???"
     @State private var showingAlert = false
     
     static var defaultWakeTime: Date {
@@ -27,38 +27,48 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             Form {
-                // 使用 VStatck 處理 Divider 每個元件下都有 Divider
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("When do you want ot wake up?")
-                        .font(.headline)
-                    
+                Section {
                     DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
                         .labelsHidden()
+                } header: {
+                    Text("When do you want ot wake up?")
+                        .font(.headline)
+                        .textCase(nil)
                 }
-                
-                VStack(alignment: .leading, spacing: 0) {
+
+                Section {
+                    Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
+                } header: {
                     Text("Desired amount of sleep")
                         .font(.headline)
-
-                    Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
+                        .textCase(nil)
                 }
-
-                VStack(alignment: .leading, spacing: 0) {
-                    Text("Daily coffee intake")
-                        .font(.headline)
-
-                    Stepper(coffeeAmount == 1 ? "1 cup" : "\(coffeeAmount) cups", value: $coffeeAmount, in: 1...20)
+                
+                Section {
+                    Picker("Daily coffee intake", selection: $coffeeAmount) {
+                        ForEach(1..<21) { number in
+                            Text("\(number) \(number == 1 ? "cup" : "cups")")
+                        }
+                        
+                    }
+                    .pickerStyle(.menu)
                 }
+            }
+            .onChange(of: wakeUp, perform: { _ in calculateBedtime()})
+            .onChange(of: sleepAmount, perform: { _ in calculateBedtime()})
+            .onChange(of: coffeeAmount, perform: { _ in calculateBedtime()})
+            .overlay(alignment: .center) {
+                VStack {
+                    Text(alertTitle)
+                        .font(.largeTitle)
+    
+                    Text(alertMessage)
+                        .font(.largeTitle)
+                        .foregroundColor(.red)
+                }
+                .offset(y: 20)
             }
             .navigationTitle("BetterRest")
-            .toolbar {
-                Button("Calculate", action: calculateBedtime)
-            }
-            .alert(alertTitle, isPresented: $showingAlert) {
-                Button("OK") {}
-            } message: {
-                Text(alertMessage)
-            }
         }
     }
     
@@ -83,8 +93,6 @@ struct ContentView: View {
             alertTitle = "Error"
             alertMessage = "Sorry, there was a problem calculating your bedtime."
         }
-        
-        showingAlert = true
     }
 }
 
