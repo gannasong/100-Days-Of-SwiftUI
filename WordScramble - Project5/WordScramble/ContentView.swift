@@ -15,12 +15,24 @@ struct ContentView: View {
     @State private var errorMessage = ""
     @State private var showingError = false
     
+    @State private var restartRotate = false
+    @State private var wordVerify = false
+    @State private var score: Int = 0
+    
     var body: some View {
         NavigationView {
             List {
                 Section {
                     TextField("Enter your word", text: $newWord)
                         .autocapitalization(.none)
+                } header: {
+                    Text("New word").textCase(nil)
+                }
+                
+                Section {
+                    Text("Current Score: \(score)")
+                } header: {
+                    Text("Your score")
                 }
                 
                 Section {
@@ -30,6 +42,10 @@ struct ContentView: View {
                             Text(word)
                         }
                     }
+                } header: {
+                    Text("Used Word")
+                        .opacity(usedWord.isEmpty ? 0 : 1)
+                        .textCase(nil)
                 }
             }
             .navigationTitle(rootWord)
@@ -40,10 +56,44 @@ struct ContentView: View {
             } message: {
                 Text(errorMessage)
             }
+            .onChange(of: newWord) { input in
+                if input.count > 3 && input != rootWord {
+                    wordVerify = true
+                } else {
+                    wordVerify = false
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button {
+                        withAnimation {
+                            restartRotate = true
+                            startGame()
+                        }
+                        
+                        restartRotate = false
+                    } label: {
+                        HStack {
+                            Image(systemName: "gobackward")
+                                .foregroundColor(.red)
+                                .rotationEffect(.degrees(restartRotate ? 360 : 0))
+                                
+                            Text("Restart")
+                                .foregroundColor(.red)
+                                .font(.system(size: 20))
+                        }
+                    }
+                }
+            }
         }
     }
     
     func addNewWord() {
+        guard wordVerify else {
+            wordError(title: "Hey!", message: "You can't input shorter than three letters or are just our start word!")
+            return
+        }
+        
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         guard answer.count > 0 else { return }
         
@@ -68,6 +118,7 @@ struct ContentView: View {
             usedWord.insert(answer, at: 0)
         }
         newWord = ""
+        score += 1
     }
     
     func startGame() {
@@ -75,6 +126,8 @@ struct ContentView: View {
             if let startWords = try? String(contentsOf: startWordURL) {
                 let allWords = startWords.components(separatedBy: "\n")
                 rootWord = allWords.randomElement() ?? "silkworm"
+                score = 0
+                usedWord = []
                 return
             }
         }
