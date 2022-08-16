@@ -23,7 +23,9 @@ struct iExpenseApp: App {
 //            AppStoreageContentView()
             
             // Archiving Swift objects with Codable
-            CodableContentView()
+//            CodableContentView()
+            
+            StateObjectContentView()
         }
     }
 }
