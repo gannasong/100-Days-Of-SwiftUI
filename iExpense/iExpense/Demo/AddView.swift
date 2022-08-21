@@ -15,7 +15,18 @@ struct AddView: View {
     @State private var type = "Personal"
     @State private var amount = 0.0
     
-    let types = ["Business", "Personal"]
+    var isDisabled: Bool {
+        return !(!name.isEmpty && amount > 0.0)
+    }
+    
+    let types = ["Personal", "Business"]
+    var currencyFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }
+    
     
     var body: some View {
         NavigationView {
@@ -29,15 +40,31 @@ struct AddView: View {
                 }
                 .pickerStyle(.segmented)
                 
-                TextField("Amount", value: $amount, format: .currency(code: "USD"))
+                TextField("Amount", value: $amount, format: .currency(code: Locale.current.currencyCode ?? "USD"))
                     .keyboardType(.decimalPad)
             }
             .navigationTitle("Add new expense")
             .toolbar {
-                Button("Save") {
-                    let item = ExpenseItem(name: name, type: type, amount: amount)
-                    expenses.items.append(item)
-                    dismiss()
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Save") {
+                        let item = ExpenseItem(name: name, type: type, amount: amount)
+                        if type == "Personal" {
+                            expenses.personalItems.append(item)
+                        }
+                        
+                        if type == "Business" {
+                            expenses.businessItems.append(item)
+                        }
+                        
+                        dismiss()
+                    }
+                    .disabled(isDisabled)
                 }
             }
         }

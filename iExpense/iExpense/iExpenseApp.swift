@@ -11,7 +11,7 @@ import SwiftUI
 struct iExpenseApp: App {
     var body: some Scene {
         WindowGroup {
-//            ContentView()
+            ContentView()
             
             // Showing and hiding views
 //            SheetContentView()
@@ -25,7 +25,7 @@ struct iExpenseApp: App {
             // Archiving Swift objects with Codable
 //            CodableContentView()
             
-            StateObjectContentView()
+//            StateObjectContentView()
         }
     }
 }
